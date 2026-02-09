@@ -5,7 +5,6 @@ from datetime import datetime
 from kafka import KafkaProducer
 from fake_data import generate_fake_request
 
-
 BOOTSTRAP = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092")
 TOPIC = os.getenv("KAFKA_TOPIC", "logs-topic")
 
