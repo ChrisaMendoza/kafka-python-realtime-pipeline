@@ -1,10 +1,16 @@
+import os
 import json
 import uuid
 from datetime import datetime
 from kafka import KafkaProducer
+from fake_data import generate_fake_request
+
+
+BOOTSTRAP = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092")
+TOPIC = os.getenv("KAFKA_TOPIC", "logs-topic")
 
 producer = KafkaProducer(
-    bootstrap_servers="kafka:9092",
+    bootstrap_servers=BOOTSTRAP,
     value_serializer=lambda v: json.dumps(v).encode("utf-8")
 )
 
@@ -13,12 +19,10 @@ message = {
     "timestamp": datetime.utcnow().isoformat(),
     "source": "python-producer",
     "type": "test",
-    "payload": {
-        "message": "hello kafka"
-    }
+    "payload": generate_fake_request()
 }
 
-producer.send("logs-topic", message)
+producer.send(TOPIC, message)
 producer.flush()
 
-print("Message envoyé :", message)
+print(f"Message envoyé sur {TOPIC} via {BOOTSTRAP} :", message)
