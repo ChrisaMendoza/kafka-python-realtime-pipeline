@@ -20,10 +20,35 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    networks:
+      - kafka-network
+
+  producer:
+    build:
+      context: ./producer
+      dockerfile: Dockerfile
+    container_name: kafka-producer
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    networks:
+      - kafka-network
+      
+  consumer:
+    build:
+      context: ./consumer
+      dockerfile: Dockerfile
+    container_name: kafka-consumer
+    depends_on:
+      - kafka
+      - producer
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     networks:
       - kafka-network
 
