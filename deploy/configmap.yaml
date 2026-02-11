@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: pipeline-temps-reel
+data:
+  KAFKA_BROKER: "kafka-service:9092"
+  TOPIC_NAME: "transactions"
