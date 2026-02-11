@@ -16,6 +16,13 @@ spec:
       containers:
       - name: producer
         image: lovecookie93/kafka-producer:latest
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
         envFrom:
         - configMapRef:
             name: app-config
