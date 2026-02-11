@@ -26,6 +26,12 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
     networks:
       - kafka-network
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092 || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
 
   producer:
     build:
@@ -33,11 +39,13 @@ services:
       dockerfile: Dockerfile
     container_name: kafka-producer
     depends_on:
-      - kafka
+      kafka:
+        condition: service_healthy
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     networks:
       - kafka-network
+    restart: on-failure
       
   consumer:
     build:
@@ -45,12 +53,15 @@ services:
       dockerfile: Dockerfile
     container_name: kafka-consumer
     depends_on:
-      - kafka
-      - producer
+      kafka:
+        condition: service_healthy
+      producer:
+        condition: service_started
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     networks:
       - kafka-network
+    restart: on-failure
 
 networks:
   kafka-network:
