@@ -17,7 +17,7 @@ L'ensemble de l'application est conteneurisée avec Docker, orchestrable localem
 ```
 ┌─────────────────┐       ┌───────────────────────────┐       ┌─────────────────┐
 │                 │       │                           │       │                 │
-│  Producer       │──────▶│  Kafka  +  Zookeeper      │──────▶│  Consumer       │
+│  Producer       │──────▶│  Kafka (KRaft Mode)       │──────▶│  Consumer      │
 │  (Python)       │       │  (Message Broker)         │       │  (Python)       │
 │                 │       │                           │       │                 │
 └─────────────────┘       └───────────────────────────┘       └─────────────────┘
@@ -29,7 +29,7 @@ L'ensemble de l'application est conteneurisée avec Docker, orchestrable localem
 
 **Flux de données :**
 1. Le **Producer** génère des données de transactions fictives et les envoie dans le topic Kafka `transactions`
-2. **Kafka** (avec Zookeeper pour la coordination) reçoit et stocke les messages
+2. Kafka (en mode KRaft) gère sa propre coordination, reçoit et stocke les messages
 3. Le **Consumer** s'abonne au topic et traite les messages reçus en temps réel
 
 ---
@@ -54,12 +54,11 @@ kafka-python-realtime-pipeline/
 │   └── Dockerfile               # Image Docker du consommateur
 │
 ├── deploy/                      # Manifestes Kubernetes
-│   ├── kafka-deployment.yaml
-│   ├── zookeeper-deployment.yaml
-│   ├── producer-deployment.yaml
-│   ├── consumer-deployment.yaml
-│   ├── configmap.yaml
-│   └── secret.yaml
+│   ├── kafka.yaml               # Service + Deployment Kafka (Mode KRaft)
+│   ├── producer-deployment.yaml # Déploiement du Producer Python
+│   ├── consumer-deployment.yaml # Déploiement du Consumer Python
+│   ├── configmap.yaml           # Configuration des variables d'env
+│   └── namespace.yaml           # Création de l'espace de noms
 │
 ├── docker-compose.yml           # Orchestration locale de tous les services
 ├── .dockerignore                # Fichiers exclus du contexte de build
@@ -74,8 +73,7 @@ kafka-python-realtime-pipeline/
 | Technologie | Rôle |
 |---|---|
 | **Python 3.11** | Scripts producteur et consommateur |
-| **Apache Kafka** | Message broker temps réel |
-| **Zookeeper** | Coordination et gestion du cluster Kafka |
+| **Apache Kafka** | Message broker temps réel (Mode KRaft, version 3.x) |
 | **Docker** | Conteneurisation des services |
 | **Docker Compose** | Orchestration locale multi-conteneurs |
 | **Kubernetes** | Orchestration en production |
@@ -113,7 +111,7 @@ docker-compose up --build
 Dans les logs de la console, vous devriez observer :
 
 ```
-zookeeper  | ... Started
+**Python 3.11** | Scripts producteur et consommateur |
 kafka      | ... [KafkaServer id=1] started
 producer   | ✅ Transaction envoyée : {"id": "txn-001", "montant": 142.50, ...}
 consumer   | ✅ Message reçu : {"id": "txn-001", "montant": 142.50, ...}
@@ -232,8 +230,7 @@ Le pipeline GitHub Actions (`.github/workflows/ci-cd.yml`) s'exécute automatiqu
 
 | Service | Port exposé | Description |
 |---|---|---|
-| Zookeeper | `2181` | Coordination du cluster Kafka |
-| Kafka | `9092` | Message broker principal |
+| Kafka | `9092` | Message broker principal (Broker + Controller) |
 | Producer | — | Service interne, sans port exposé |
 | Consumer | — | Service interne, sans port exposé |
 
