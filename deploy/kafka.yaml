@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: kafka-service
+  name: kafka # On change le nom ici pour que le Consumer le trouve
   namespace: pipeline-temps-reel
 spec:
   selector:
@@ -51,7 +51,7 @@ spec:
               value: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
             # L'adresse que le Producer et le Consumer utiliseront
             - name: KAFKA_ADVERTISED_LISTENERS
-              value: "PLAINTEXT://kafka-service:9092"
+              value: "PLAINTEXT://kafka:9092"
             - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
               value: "1"
           resources:
