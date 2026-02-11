@@ -22,7 +22,7 @@ jobs:
         with:
           context: ./producer
           push: true
-          tags: TON_USER_DOCKERHUB/kafka-producer:latest
+          tags: lovecookie93/kafka-producer:latest
 
       - name: Build and push Consumer
         uses: docker/build-push-action@v4
