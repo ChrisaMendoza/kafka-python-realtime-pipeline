@@ -4,5 +4,5 @@ metadata:
   name: app-config
   namespace: pipeline-temps-reel
 data:
-  KAFKA_BOOTSTRAP_SERVERS: "kafka-service:9092"
+  KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
   KAFKA_TOPIC: "logs-topic"
