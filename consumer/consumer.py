@@ -2,7 +2,7 @@ import json
 from kafka import KafkaConsumer
 
 consumer = KafkaConsumer(
-    "logs-topic",
+    "transactions",
     bootstrap_servers="kafka:9092",
     auto_offset_reset="earliest",
     enable_auto_commit=True,

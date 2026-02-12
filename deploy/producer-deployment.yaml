@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: producer
+  namespace: pipeline-temps-reel
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: producer
+  template:
+    metadata:
+      labels:
+        app: producer
+    spec:
+      containers:
+      - name: producer
+        image: lovecookie93/kafka-producer:latest
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        env: # On ajoute ta variable ici
+          - name: KAFKA_BOOTSTRAP_SERVERS
+            value: "kafka:9092"
+        envFrom: # On garde ton ConfigMap juste en dessous
+          - configMapRef:
+              name: app-config
